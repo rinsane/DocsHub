@@ -5,22 +5,24 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 from django.contrib import messages
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from rest_framework import viewsets, status
-from rest_framework.decorators import action, api_view
+from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 import json
 
 
 @api_view(['POST'])
+@permission_classes([AllowAny])
+@csrf_exempt
 def register(request):
     """User registration API"""
     try:
-        data = json.loads(request.body)
-        username = data.get('username')
-        email = data.get('email')
-        password = data.get('password')
+        # Use request.data instead of request.body for DRF
+        username = request.data.get('username')
+        email = request.data.get('email')
+        password = request.data.get('password')
         
         if not all([username, email, password]):
             return Response({'error': 'Missing fields'}, status=status.HTTP_400_BAD_REQUEST)
@@ -41,12 +43,17 @@ def register(request):
 
 
 @api_view(['POST'])
+@permission_classes([AllowAny])
+@csrf_exempt
 def login_view(request):
     """User login API"""
     try:
-        data = json.loads(request.body)
-        username = data.get('username')
-        password = data.get('password')
+        # Use request.data instead of request.body for DRF
+        username = request.data.get('username')
+        password = request.data.get('password')
+        
+        if not username or not password:
+            return Response({'error': 'Username and password are required'}, status=status.HTTP_400_BAD_REQUEST)
         
         user = authenticate(request, username=username, password=password)
         if user is not None:
@@ -62,6 +69,8 @@ def login_view(request):
 
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
+@csrf_exempt
 def logout_view(request):
     """User logout API"""
     logout(request)
@@ -69,6 +78,7 @@ def logout_view(request):
 
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def profile_view(request):
     """Get user profile"""
     if not request.user.is_authenticated:
@@ -159,8 +169,8 @@ class UserLoginView:
 
 @login_required
 @require_http_methods(["GET"])
-def logout_view(request):
-    """User logout view"""
+def logout_view_old(request):
+    """User logout view (legacy template-based)"""
     logout(request)
     messages.success(request, 'You have been logged out.')
     return redirect('home')
@@ -168,8 +178,8 @@ def logout_view(request):
 
 @login_required
 @require_http_methods(["GET", "POST"])
-def profile_view(request):
-    """User profile view"""
+def profile_view_old(request):
+    """User profile view (legacy template-based)"""
     user = request.user
     
     if request.method == 'POST':

@@ -17,6 +17,11 @@ class DocumentConsumer(AsyncWebsocketConsumer):
         self.room_group_name = f'document_{self.document_id}'
         self.user = self.scope['user']
         
+        # Check if user is authenticated
+        if not self.user.is_authenticated:
+            await self.close()
+            return
+        
         # Check if user has access
         has_access = await self.check_document_access()
         
@@ -31,6 +36,15 @@ class DocumentConsumer(AsyncWebsocketConsumer):
         )
         
         await self.accept()
+        
+        # Get current active users in the room
+        active_users = await self.get_active_users()
+        
+        # Send current user list to the newly connected user
+        await self.send(text_data=json.dumps({
+            'type': 'active_users',
+            'users': active_users
+        }))
         
         # Notify others that user joined
         await self.channel_layer.group_send(
@@ -100,15 +114,14 @@ class DocumentConsumer(AsyncWebsocketConsumer):
     
     async def content_change(self, event):
         """Send content change to WebSocket"""
-        # Don't send to the user who made the change
-        if event['user_id'] != self.user.id:
-            await self.send(text_data=json.dumps({
-                'type': 'content_change',
-                'user_id': event['user_id'],
-                'username': event['username'],
-                'content': event['content'],
-                'delta': event.get('delta')
-            }))
+        # Send to all users (the frontend will handle not overwriting local edits)
+        await self.send(text_data=json.dumps({
+            'type': 'content_change',
+            'user_id': event['user_id'],
+            'username': event['username'],
+            'content': event['content'],
+            'delta': event.get('delta')
+        }))
     
     async def cursor_change(self, event):
         """Send cursor position change to WebSocket"""
@@ -157,6 +170,13 @@ class DocumentConsumer(AsyncWebsocketConsumer):
             document.save(update_fields=['content', 'last_edited_by', 'updated_at'])
         except Document.DoesNotExist:
             pass
+    
+    @database_sync_to_async
+    def get_active_users(self):
+        """Get list of active users in the room (simplified - returns current user)"""
+        # In a real implementation, you'd track users in Redis or database
+        # For now, we'll rely on user_joined/user_left events
+        return [{'id': self.user.id, 'username': self.user.username}]
 
 
 class SpreadsheetConsumer(AsyncWebsocketConsumer):

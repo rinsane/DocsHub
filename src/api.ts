@@ -1,14 +1,32 @@
 import axios from 'axios'
 
+// Helper function to get CSRF token from cookies
+function getCookie(name: string): string | null {
+  let cookieValue = null
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';')
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim()
+      if (cookie.substring(0, name.length + 1) === name + '=') {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1))
+        break
+      }
+    }
+  }
+  return cookieValue
+}
+
 const API = axios.create({
   baseURL: '/api',
   headers: {
     'Content-Type': 'application/json',
   },
+  withCredentials: true, // Important for cookies/CSRF
 })
 
 API.interceptors.request.use((config) => {
-  const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.getAttribute('value')
+  // Get CSRF token from cookie
+  const csrfToken = getCookie('csrftoken')
   if (csrfToken) {
     config.headers['X-CSRFToken'] = csrfToken
   }
@@ -32,7 +50,7 @@ export const documents = {
   delete: (id: number) => API.post(`/documents/${id}/delete/`),
   addComment: (id: number, data: any) => API.post(`/documents/${id}/comment/`, data),
   getComments: (id: number) => API.get(`/documents/${id}/comments/`),
-  share: (id: number, email: string, role: string) =>
+  share: (id: number, email: string, role: string = 'viewer') =>
     API.post(`/documents/${id}/permission/add/`, { email, role }),
   export: (id: number, format: string) => API.get(`/documents/${id}/export/${format}/`),
   import: (id: number, file: File) => {

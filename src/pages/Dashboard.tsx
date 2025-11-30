@@ -52,6 +52,24 @@ export default function Dashboard() {
     }
   }
 
+  const handleShare = async (id: number, type: 'document' | 'spreadsheet') => {
+    const email = prompt('Enter email address to share with:')
+    if (!email) return
+    
+    const role = prompt('Enter role (viewer/editor/commenter):', 'viewer') || 'viewer'
+    
+    try {
+      if (type === 'document') {
+        await documents.share(id, email, role)
+      } else {
+        await spreadsheets.share(id, email, role)
+      }
+      alert('Document shared successfully!')
+    } catch (error: any) {
+      alert(error.response?.data?.error || 'Failed to share')
+    }
+  }
+
   const handleDelete = async (id: number, type: 'document' | 'spreadsheet') => {
     if (confirm('Are you sure you want to delete this?')) {
       try {
@@ -69,7 +87,7 @@ export default function Dashboard() {
   }
 
   if (loading) {
-    return <div className="text-center py-8">Loading...</div>
+    return <div className="text-center py-8 text-white">Loading...</div>
   }
 
   return (
@@ -77,7 +95,7 @@ export default function Dashboard() {
       {/* Documents */}
       <section>
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+          <h2 className="text-2xl font-bold text-white flex items-center gap-2">
             <FileText size={28} />
             Documents
           </h2>
@@ -88,25 +106,29 @@ export default function Dashboard() {
         </div>
 
         {docs.length === 0 ? (
-          <div className="text-center py-12 bg-gray-100 rounded-lg">
-            <p className="text-gray-600">No documents yet. Create one to get started!</p>
+          <div className="text-center py-12 bg-[#f89643] rounded-lg">
+            <p className="text-black">No documents yet. Create one to get started!</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {docs.map((doc) => (
-              <div key={doc.id} className="card p-4 hover:shadow-lg transition-shadow cursor-pointer">
-                <h3 className="font-semibold text-lg mb-2">{doc.title}</h3>
-                <p className="text-sm text-gray-600 mb-4">
+              <div key={doc.id} className="card p-4 hover:opacity-90 transition-opacity cursor-pointer">
+                <h3 className="font-semibold text-lg mb-2 text-black">{doc.title}</h3>
+                <p className="text-sm text-black/70 mb-4">
                   by {doc.owner.username}
                 </p>
                 <div className="flex gap-2">
                   <button
                     onClick={() => navigate(`/documents/${doc.id}`)}
-                    className="flex-1 btn btn-primary text-sm"
+                    className="flex-1 btn bg-black text-white hover:bg-gray-800 text-sm"
                   >
                     Open
                   </button>
-                  <button className="btn btn-secondary p-2">
+                  <button 
+                    onClick={() => handleShare(doc.id, 'document')}
+                    className="btn bg-black text-white hover:bg-gray-800 p-2"
+                    title="Share document"
+                  >
                     <Share2 size={18} />
                   </button>
                   <button
@@ -125,7 +147,7 @@ export default function Dashboard() {
       {/* Spreadsheets */}
       <section>
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+          <h2 className="text-2xl font-bold text-white flex items-center gap-2">
             <Table size={28} />
             Spreadsheets
           </h2>
@@ -136,25 +158,29 @@ export default function Dashboard() {
         </div>
 
         {sheets.length === 0 ? (
-          <div className="text-center py-12 bg-gray-100 rounded-lg">
-            <p className="text-gray-600">No spreadsheets yet. Create one to get started!</p>
+          <div className="text-center py-12 bg-[#f89643] rounded-lg">
+            <p className="text-black">No spreadsheets yet. Create one to get started!</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {sheets.map((sheet) => (
-              <div key={sheet.id} className="card p-4 hover:shadow-lg transition-shadow">
-                <h3 className="font-semibold text-lg mb-2">{sheet.title}</h3>
-                <p className="text-sm text-gray-600 mb-4">
+              <div key={sheet.id} className="card p-4 hover:opacity-90 transition-opacity">
+                <h3 className="font-semibold text-lg mb-2 text-black">{sheet.title}</h3>
+                <p className="text-sm text-black/70 mb-4">
                   by {sheet.owner.username}
                 </p>
                 <div className="flex gap-2">
                   <button
                     onClick={() => navigate(`/spreadsheets/${sheet.id}`)}
-                    className="flex-1 btn btn-primary text-sm"
+                    className="flex-1 btn bg-black text-white hover:bg-gray-800 text-sm"
                   >
                     Open
                   </button>
-                  <button className="btn btn-secondary p-2">
+                  <button 
+                    onClick={() => handleShare(sheet.id, 'spreadsheet')}
+                    className="btn bg-black text-white hover:bg-gray-800 p-2"
+                    title="Share spreadsheet"
+                  >
                     <Share2 size={18} />
                   </button>
                   <button

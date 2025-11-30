@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 body {
-  @apply antialiased;
+  @apply antialiased bg-black text-white;
 }
 
 .btn {
@@ -11,11 +11,11 @@ body {
 }
 
 .btn-primary {
-  @apply bg-blue-600 text-white hover:bg-blue-700;
+  @apply bg-[#f89643] text-black hover:bg-[#f89643]/90;
 }
 
 .btn-secondary {
-  @apply bg-gray-200 text-gray-800 hover:bg-gray-300;
+  @apply bg-[#f89643] text-black hover:bg-[#f89643]/90;
 }
 
 .btn-danger {
@@ -23,9 +23,9 @@ body {
 }
 
 .input {
-  @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500;
+  @apply w-full px-4 py-2 bg-black border border-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#f89643] placeholder-gray-500;
 }
 
 .card {
-  @apply bg-white rounded-lg shadow-sm border border-gray-200;
+  @apply bg-[#f89643] rounded-lg shadow-sm text-black;
 }

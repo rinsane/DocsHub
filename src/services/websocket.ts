@@ -1,7 +1,7 @@
 type MessageHandler = (data: any) => void
 
 class WebSocketManager {
-  private ws: WebSocket | null = null
+  public ws: WebSocket | null = null
   private url: string
   private handlers: Map<string, Set<MessageHandler>> = new Map()
   private reconnectAttempts = 0

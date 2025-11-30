@@ -16,10 +16,11 @@ Including another URLconf
 """
 
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
 from django.http import HttpResponse
 from django.conf import settings
 from django.conf.urls.static import static
+from django.views.static import serve
 import os
 
 def serve_react_app(request, *args, **kwargs):
@@ -42,12 +43,23 @@ urlpatterns = [
     path("api/notifications/", include("notifications.urls")),
 ]
 
-# Serve static files
-urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# Serve static files in development
+if settings.DEBUG:
+    # Explicitly serve static files from dist directory
+    dist_dir = os.path.join(settings.BASE_DIR, 'static', 'dist')
+    urlpatterns += [
+        re_path(r'^static/(?P<path>.*)$', serve, {
+            'document_root': dist_dir,
+            'show_indexes': False,
+        }),
+    ]
+    # Also serve other static files (if any)
+    from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+    urlpatterns += staticfiles_urlpatterns()
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
-# Catch-all for React routes - must be last
+# Catch-all for React routes - must be last (excludes static, api, admin, media)
+# This regex matches any path that doesn't start with static/, api/, admin/, or media/
 urlpatterns += [
-    path("<path:path>", serve_react_app),
-    path("", serve_react_app),
+    re_path(r'^(?!static/|api/|admin/|media/).*', serve_react_app),
 ]
