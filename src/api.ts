@@ -48,6 +48,7 @@ export const documents = {
   get: (id: number) => API.get(`/documents/${id}/`),
   update: (id: number, data: any) => API.post(`/documents/${id}/update/`, data),
   delete: (id: number) => API.post(`/documents/${id}/delete/`),
+  remove: (id: number) => API.post(`/documents/${id}/remove/`),
   addComment: (id: number, data: any) => API.post(`/documents/${id}/comment/`, data),
   getComments: (id: number) => API.get(`/documents/${id}/comments/`),
   share: (id: number, email: string, role: string = 'viewer') =>

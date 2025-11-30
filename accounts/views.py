@@ -32,6 +32,8 @@ def register(request):
         
         user = User.objects.create_user(username=username, email=email, password=password)
         login(request, user)
+        # Explicitly save the session to ensure cookie is set
+        request.session.save()
         
         return Response({
             'id': user.id,
@@ -58,6 +60,8 @@ def login_view(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
+            # Explicitly save the session to ensure cookie is set
+            request.session.save()
             return Response({
                 'id': user.id,
                 'username': user.username,
@@ -81,8 +85,13 @@ def logout_view(request):
 @permission_classes([IsAuthenticated])
 def profile_view(request):
     """Get user profile"""
-    if not request.user.is_authenticated:
+    # The @permission_classes([IsAuthenticated]) decorator already checks authentication
+    # But we'll add an extra check to ensure the user is authenticated
+    if not request.user or not request.user.is_authenticated:
         return Response({'error': 'Not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
+    
+    # Ensure session is saved (this extends the session lifetime)
+    request.session.save()
     
     return Response({
         'id': request.user.id,

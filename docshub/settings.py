@@ -172,12 +172,16 @@ CORS_ALLOW_ALL_ORIGINS = True  # For development only
 CORS_ALLOW_CREDENTIALS = True
 
 # Session settings for persistence
-SESSION_COOKIE_AGE = 86400  # 24 hours
+SESSION_COOKIE_AGE = 86400 * 7  # 7 days
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SECURE = False  # Set to True in production with HTTPS
 SESSION_COOKIE_SAMESITE = 'Lax'
 SESSION_SAVE_EVERY_REQUEST = True  # Extend session on each request
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # Keep session after browser close
+SESSION_COOKIE_NAME = 'sessionid'  # Explicit cookie name
+SESSION_COOKIE_PATH = '/'  # Make sure cookie is available for all paths
+# Ensure session is saved even if no changes
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
 # Celery configuration
 CELERY_BROKER_URL = 'redis://localhost:6379/0'

@@ -10,4 +10,5 @@ urlpatterns = [
     path('<int:id>/update/', api.document_update, name='update'),
     path('<int:id>/delete/', api.document_delete, name='delete'),
     path('<int:id>/permission/add/', api.document_share, name='share'),
+    path('<int:id>/remove/', api.document_remove, name='remove'),
 ]

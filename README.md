@@ -1,82 +1,359 @@
 # DocsHub
 
-Real-time collaborative document and spreadsheet editor.
+A modern, real-time collaborative document and spreadsheet editor built with Django, React, and WebSockets.
 
-## Quick Start
+![DocsHub](Docs-Hub.png)
 
-### 1. Install Dependencies
+## 🌟 Features
+
+- **Real-time Collaborative Editing**: Multiple users can edit documents and spreadsheets simultaneously
+- **Rich Text Editor**: Powered by Quill with formatting options
+- **Spreadsheet Editor**: Full-featured grid with formulas using Handsontable
+- **WebSocket Sync**: Instant updates across all connected clients
+- **Role-Based Access**: Owner, Editor, Commenter, and Viewer roles
+- **User Authentication**: Secure login and registration
+- **Document Management**: Create, share, and organize documents/spreadsheets
+- **Export**: Download documents as .txt files
+- **Notifications**: Real-time notifications for shares and comments
+
+## 🛠️ Tech Stack
+
+### Backend
+- **Django 4.2** - Web framework
+- **Django Channels 4.0** - WebSocket support
+- **Redis** - Channel layer for real-time messaging
+- **Celery** - Background task processing
+- **PostgreSQL/SQLite** - Database
+
+### Frontend
+- **React 18** - UI library
+- **TypeScript** - Type safety
+- **Vite** - Build tool
+- **TailwindCSS** - Styling
+- **React Router** - Navigation
+- **Zustand** - State management
+- **Quill** - Rich text editor
+- **Handsontable** - Spreadsheet component
+
+## 📋 Prerequisites
+
+Before you begin, ensure you have the following installed:
+
+- **Python 3.10+** ([Download](https://www.python.org/downloads/))
+- **Node.js 18+** and npm ([Download](https://nodejs.org/))
+- **Redis** ([Installation guide](https://redis.io/docs/getting-started/installation/))
+- **Git** ([Download](https://git-scm.com/downloads))
+
+## 🚀 Installation & Setup
+
+Follow these steps to get DocsHub running on your local machine:
+
+### Step 1: Clone the Repository
+
+```bash
+git clone <your-repo-url>
+cd DocsHub
+```
+
+### Step 2: Set Up Python Virtual Environment
+
+```bash
+# Create virtual environment
+python -m venv venv
+
+# Activate virtual environment
+# On Linux/Mac:
+source venv/bin/activate
+# On Windows:
+# venv\Scripts\activate
+```
+
+### Step 3: Install Python Dependencies
 
 ```bash
 pip install -r requirements.txt
+```
+
+### Step 4: Install Node.js Dependencies
+
+```bash
+npm install
+```
+
+### Step 5: Set Up Database
+
+```bash
+# Run migrations to create database tables
+python manage.py migrate
+
+# Create a superuser account for admin access
+python manage.py createsuperuser
+# Follow the prompts to enter username, email, and password
+```
+
+### Step 6: Build Frontend
+
+```bash
+# Build the React frontend
+npm run build
+```
+
+This compiles the React app into static files that Django will serve.
+
+### Step 7: Collect Static Files (Optional)
+
+```bash
+# Collect all static files for production
+python manage.py collectstatic --noinput
+```
+
+## 🎮 Running the Application
+
+You need to start three services in separate terminal windows/tabs:
+
+### Terminal 1: Start Redis Server
+
+Redis is required for WebSocket channel layers.
+
+```bash
+# Start Redis server
+redis-server
+
+# Keep this terminal running
+```
+
+### Terminal 2: Start Django Server
+
+```bash
+# Make sure virtual environment is activated
+source venv/bin/activate  # or venv\Scripts\activate on Windows
+
+# Start Django development server
+python manage.py runserver
+
+# Keep this terminal running
+# Server will be available at http://localhost:8000
+```
+
+### Terminal 3: Start Celery Worker (Optional)
+
+Celery handles background tasks like notifications.
+
+```bash
+# Make sure virtual environment is activated
+source venv/bin/activate  # or venv\Scripts\activate on Windows
+
+# Start Celery worker
+celery -A docshub worker -l info
+
+# Keep this terminal running
+```
+
+## 🌐 Access the Application
+
+Once all services are running:
+
+- **Frontend Application**: http://localhost:8000
+- **Django Admin Panel**: http://localhost:8000/admin
+  - Login with the superuser credentials you created
+
+## 📁 Project Structure
+
+```
+DocsHub/
+├── docshub/              # Django project settings
+│   ├── settings.py       # Main settings
+│   ├── urls.py           # URL routing
+│   ├── asgi.py           # ASGI config for WebSockets
+│   └── celery.py         # Celery configuration
+├── accounts/             # User authentication app
+├── documents/            # Document management app
+├── spreadsheets/         # Spreadsheet management app
+├── collaboration/        # WebSocket consumers for real-time sync
+├── notifications/        # Notification system
+├── src/                  # React frontend source code
+│   ├── pages/            # Page components
+│   ├── components/       # Reusable UI components
+│   ├── services/         # WebSocket and API services
+│   ├── api.ts            # API client
+│   ├── store.ts          # Global state management
+│   └── App.tsx           # Main React component
+├── static/dist/          # Built frontend (generated by npm run build)
+├── public/               # Public assets
+├── manage.py             # Django management script
+├── requirements.txt      # Python dependencies
+├── package.json          # Node.js dependencies
+└── vite.config.ts        # Vite configuration
+
+```
+
+## 🔧 Development Workflow
+
+### Making Frontend Changes
+
+1. Edit files in the `src/` directory
+2. Rebuild the frontend:
+   ```bash
+   npm run build
+   ```
+3. Refresh your browser to see changes
+
+### Making Backend Changes
+
+1. Edit Django files (Python files in `docshub/`, `documents/`, etc.)
+2. Django's development server auto-reloads, so changes appear immediately
+3. If you modify models, create and run migrations:
+   ```bash
+   python manage.py makemigrations
+   python manage.py migrate
+   ```
+
+### Adding New Python Packages
+
+```bash
+pip install <package-name>
+pip freeze > requirements.txt
+```
+
+### Adding New Node.js Packages
+
+```bash
+npm install <package-name>
+```
+
+## 🐛 Troubleshooting
+
+### Redis Connection Error
+
+**Error**: `Cannot connect to Redis`
+
+**Solution**: Make sure Redis is running:
+```bash
+redis-server
+```
+
+### Port Already in Use
+
+**Error**: `Error: That port is already in use`
+
+**Solution**: Either:
+- Kill the process using the port, or
+- Run Django on a different port:
+  ```bash
+  python manage.py runserver 8001
+  ```
+
+### WebSocket Connection Failed
+
+**Issue**: Real-time editing not working
+
+**Solution**: 
+1. Ensure Redis is running
+2. Check that Django server is running with ASGI support
+3. Clear browser cache and cookies
+
+### Build Errors
+
+**Error**: Frontend build fails
+
+**Solution**:
+```bash
+# Remove node_modules and reinstall
+rm -rf node_modules package-lock.json
 npm install
 npm run build
 ```
 
-### 2. Start Services
+### Database Locked
 
-```bash
-# Terminal 1: Redis
-redis-server
+**Error**: `Database is locked` (SQLite)
 
-# Terminal 2: Django
-python manage.py runserver
+**Solution**: Close all connections to the database or use PostgreSQL for production
 
-# Terminal 3: Celery (optional, for background tasks)
-celery -A docshub worker -l info
-```
+## 📝 Usage Guide
 
-### 3. Access the App
+### Creating a Document
 
-- **Frontend:** http://localhost:8000
-- **Admin:** http://localhost:8000/admin
+1. Login or register an account
+2. Click "New Document" on the dashboard
+3. Enter a title and start editing
+4. Changes are auto-saved and synced in real-time
 
-## Features
+### Sharing a Document
 
-- Real-time collaborative editing (documents & spreadsheets)
-- User authentication & role-based permissions
-- Rich text editor (Quill)
-- Spreadsheet grid (Handsontable)
-- WebSocket-based sync
-- Version history
-- Comments
-- Import/Export
+1. Open a document you own
+2. Click the "Share" button
+3. Enter the email of the user you want to share with
+4. Select their permission level (Editor, Commenter, or Viewer)
+5. Click "Share"
 
-## Tech Stack
+### Collaborative Editing
 
-- **Backend:** Django 4.2 + Channels 4.0 + Redis
-- **Frontend:** React 18 + TypeScript + Vite + TailwindCSS
+- Multiple users can edit the same document simultaneously
+- Changes appear in real-time for all connected users
+- No manual save needed - everything auto-saves
 
-## Create Superuser
+### Downloading Documents
 
-```bash
-python manage.py createsuperuser
-```
+1. Open a document
+2. Click the three dots (⋮) menu in the top right
+3. Select "Download as .txt"
 
-## Project Structure
+## 🚢 Production Deployment
 
-```
-├── docshub/          # Django settings & ASGI
-├── accounts/         # User authentication
-├── documents/        # Document management
-├── spreadsheets/     # Spreadsheet management
-├── collaboration/    # Real-time sync
-├── notifications/    # User notifications
-├── src/              # React frontend source
-│   ├── pages/        # Page components
-│   ├── components/   # Shared components
-│   ├── services/     # WebSocket, API
-│   └── App.tsx       # Main app
-└── static/dist/      # Built React app (served by Django)
-```
+For production deployment, consider:
 
-## Development
+1. **Use PostgreSQL** instead of SQLite
+2. **Set `DEBUG = False`** in `settings.py`
+3. **Configure ALLOWED_HOSTS** properly
+4. **Use a production ASGI server** like Daphne or Uvicorn
+5. **Set up HTTPS** for secure WebSocket connections (wss://)
+6. **Use a reverse proxy** like Nginx
+7. **Set environment variables** for secrets (SECRET_KEY, database passwords)
+8. **Configure static file serving** properly
 
-- Frontend changes: edit files in `src/`, then run `npm run build`
-- Backend changes: edit Django files, Django will auto-reload
-- Database: use `/admin` to manage data
-- WebSocket: automatically connects when opening documents
+Example production services:
+- **Hosting**: AWS, DigitalOcean, Heroku
+- **Database**: PostgreSQL on AWS RDS or similar
+- **Redis**: Redis Cloud, AWS ElastiCache
+- **Static Files**: S3, Cloudflare CDN
 
-## Browser Support
+## 🤝 Contributing
 
-Chrome, Firefox, Safari, Edge (latest versions)
+Contributions are welcome! Please:
 
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 🆘 Support
+
+If you encounter issues:
+
+1. Check the Troubleshooting section above
+2. Review the browser console for errors
+3. Check Django logs in the terminal
+4. Ensure all services (Redis, Django, Celery) are running
+
+## 🎯 Roadmap
+
+Future enhancements:
+- [ ] Markdown editor mode
+- [ ] Version history and rollback
+- [ ] Advanced spreadsheet formulas
+- [ ] Document templates
+- [ ] Mobile app
+- [ ] File attachments
+- [ ] Comment threads
+- [ ] Activity feed
+- [ ] Dark mode
+
+---
+
+Built with ❤️ using Django and React

@@ -16,15 +16,32 @@ function App() {
 
   useEffect(() => {
     const checkAuth = async () => {
+      // Don't clear user immediately - wait for auth check
       try {
         const res = await auth.getProfile()
-        setUser(res.data)
-      } catch {
-        setUser(null)
+        if (res.data) {
+          setUser(res.data)
+        } else {
+          setUser(null)
+        }
+      } catch (error: any) {
+        // Only clear user if it's a 401 (unauthorized), not network errors or 500s
+        const status = error.response?.status
+        if (status === 401) {
+          // Only clear if we don't have a user, or if we're sure it's an auth error
+          setUser(null)
+        } else if (!status) {
+          // Network error - don't clear user, might be temporary
+          console.warn('Network error checking auth, keeping current user state')
+        } else if (status >= 500) {
+          // Server error - don't clear user
+          console.warn('Server error checking auth, keeping current user state')
+        }
+        // For other errors, keep the current user state
       }
     }
     checkAuth()
-  }, [])
+  }, [setUser])
 
   return (
     <BrowserRouter>

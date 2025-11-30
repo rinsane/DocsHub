@@ -10,20 +10,20 @@ from .models import Spreadsheet
 def spreadsheet_list(request):
     """List user's spreadsheets"""
     try:
-    spreadsheets = Spreadsheet.objects.filter(owner=request.user)
-    data = []
-    for sheet in spreadsheets:
-        data.append({
-            'id': sheet.id,
-            'title': sheet.title,
-                'created_at': sheet.created_at.isoformat() if sheet.created_at else None,
-                'updated_at': sheet.updated_at.isoformat() if sheet.updated_at else None,
-                'owner': {
-                    'id': sheet.owner.id,
-                    'username': sheet.owner.username,
-                }
-        })
-    return Response(data)
+        spreadsheets = Spreadsheet.objects.filter(owner=request.user)
+        data = []
+        for sheet in spreadsheets:
+            data.append({
+                'id': sheet.id,
+                'title': sheet.title,
+                    'created_at': sheet.created_at.isoformat() if sheet.created_at else None,
+                    'updated_at': sheet.updated_at.isoformat() if sheet.updated_at else None,
+                    'owner': {
+                        'id': sheet.owner.id,
+                        'username': sheet.owner.username,
+                    }
+            })
+        return Response(data)
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 

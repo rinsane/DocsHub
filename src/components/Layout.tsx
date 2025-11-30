@@ -23,12 +23,24 @@ export default function Layout() {
       <header className="bg-[#f89643] shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
-            <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/')}>
+            <div 
+              className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity" 
+              onClick={() => navigate('/')}
+              title="Go to Dashboard"
+            >
               <img src="/static/Docs-Hub.png" alt="DocsHub Logo" className="h-10 w-10" />
               <h1 className="text-2xl font-bold text-black">DocsHub</h1>
             </div>
 
             <div className="flex items-center gap-4">
+              {/* User Info */}
+              {user && (
+                <div className="text-right mr-2">
+                  <div className="font-bold text-black text-sm">{user.username}</div>
+                  <div className="text-xs text-black/70">{user.email}</div>
+                </div>
+              )}
+              
               {/* Notifications */}
               <button className="relative p-2 text-black hover:text-black/80">
                 <Bell size={20} />
