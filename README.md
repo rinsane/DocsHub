@@ -221,6 +221,88 @@ pip freeze > requirements.txt
 npm install <package-name>
 ```
 
+## 🧪 Testing
+
+DocsHub includes comprehensive test suites for all modules. Run tests to ensure everything is working correctly.
+
+### Running All Tests
+
+```bash
+# Run all tests
+python manage.py test
+
+# Or use the test runner script
+./run_tests.sh
+```
+
+### Running Specific Test Suites
+
+```bash
+# Test specific app
+python manage.py test accounts
+python manage.py test documents
+python manage.py test spreadsheets
+python manage.py test notifications
+python manage.py test collaboration
+
+# Or using the script
+./run_tests.sh -a accounts
+./run_tests.sh -a documents
+```
+
+### Running Tests with Verbose Output
+
+```bash
+python manage.py test --verbosity=2
+# Or
+./run_tests.sh -v
+```
+
+### Running Tests with Coverage
+
+```bash
+# Install coverage if not already installed
+pip install coverage
+
+# Run tests with coverage
+coverage run --source='.' manage.py test
+coverage report
+coverage html  # Generates HTML report in htmlcov/
+
+# Or use the script
+./run_tests.sh -c
+```
+
+### Test Structure
+
+Tests are organized by app:
+- **accounts/tests.py**: User registration, login, logout, profile
+- **documents/tests.py**: Document models, API endpoints, permissions, sharing
+- **spreadsheets/tests.py**: Spreadsheet models, API endpoints, permissions
+- **notifications/tests.py**: Notification models and API endpoints
+- **collaboration/tests.py**: WebSocket consumer tests for real-time collaboration
+
+### Test Requirements
+
+- **Redis**: Required for WebSocket tests. Make sure Redis is running:
+  ```bash
+  redis-server
+  ```
+
+- **Database**: Tests use a separate test database (automatically created and destroyed)
+
+### Example Test Output
+
+```
+Creating test database for alias 'default'...
+System check identified no issues (0 silenced).
+...............
+----------------------------------------------------------------------
+Ran 15 tests in 2.345s
+
+OK
+```
+
 ## 🐛 Troubleshooting
 
 ### Redis Connection Error
