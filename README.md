@@ -157,6 +157,15 @@ Once all services are running:
 - **Django Admin Panel**: http://localhost:8000/admin
   - Login with the superuser credentials you created
 
+## 📚 Documentation
+
+Comprehensive documentation is available:
+
+- **[ARCHITECTURE.md](ARCHITECTURE.md)**: Complete system architecture with interactive diagrams
+- **[TESTING.md](TESTING.md)**: Comprehensive testing guide and coverage details
+- **[TEST_COMMANDS.md](TEST_COMMANDS.md)**: Quick reference for test commands
+- **[ARCHITECTURE_DIAGRAMS.md](ARCHITECTURE_DIAGRAMS.md)**: Source files for architecture diagrams (Mermaid, Graphviz, PlantUML)
+
 ## 📁 Project Structure
 
 ```
