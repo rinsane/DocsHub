@@ -61,7 +61,7 @@ graph TB
     
     subgraph "Data Layer"
         DB[(PostgreSQL/SQLite<br/>Database)]
-        Redis[(Redis<br/>Channel Layer)]
+        RedisCache[(Redis<br/>Channel Layer)]
     end
     
     subgraph "Background Services"
@@ -82,10 +82,10 @@ graph TB
     Documents --> DB
     Spreadsheets --> DB
     Notifications --> DB
-    Collaboration --> Redis
+    Collaboration --> RedisCache
     Collaboration --> DB
     Celery --> DB
-    Celery --> Redis
+    Celery --> RedisCache
 ```
 
 ### Component Interaction Flow
@@ -144,7 +144,7 @@ graph LR
     end
     
     subgraph "Cache & Messaging"
-        Redis[Redis]
+        RedisServer[Redis Server]
     end
     
     subgraph "Task Queue"
@@ -157,8 +157,8 @@ graph LR
     Django --> Gunicorn
     Django --> PostgreSQL
     Django --> SQLite
-    Channels --> Redis
-    Celery --> Redis
+    Channels --> RedisServer
+    Celery --> RedisServer
 ```
 
 ### Frontend Stack
@@ -400,7 +400,7 @@ graph TD
     end
     
     subgraph "External Services"
-        Redis[Redis]
+        RedisService[Redis]
         Celery[Celery]
     end
     
@@ -414,12 +414,12 @@ graph TD
     DRF --> Spreadsheets
     DRF --> Notifications
     Channels --> Collaboration
-    Collaboration --> Redis
+    Collaboration --> RedisCache
     Documents --> Notifications
     Spreadsheets --> Notifications
     Accounts --> Documents
     Accounts --> Spreadsheets
-    Celery --> Redis
+    Celery --> RedisCache
     Celery --> Documents
 ```
 
@@ -646,8 +646,8 @@ graph TB
         Channel[Channel Layer]
     end
     
-    subgraph "Redis"
-        Redis[(Redis Server)]
+    subgraph "Redis Layer"
+        RedisServer[(Redis Server)]
         Groups[Channel Groups]
     end
     
@@ -658,8 +658,8 @@ graph TB
     ASGI --> Router
     Router --> Consumer
     Consumer --> Channel
-    Channel --> Redis
-    Redis --> Groups
+    Channel --> RedisServer
+    RedisServer --> Groups
     Groups --> Channel
     Channel --> Consumer
     Consumer --> WS1
@@ -776,8 +776,8 @@ graph TB
     end
     
     subgraph "Cache & Queue"
-        Redis1[(Redis Master)]
-        Redis2[(Redis Replica)]
+        RedisMaster[(Redis Master)]
+        RedisReplica[(Redis Replica)]
     end
     
     subgraph "Background Workers"
@@ -796,12 +796,12 @@ graph TB
     App2 --> DB1
     App3 --> DB1
     DB1 --> DB2
-    App1 --> Redis1
-    App2 --> Redis1
-    App3 --> Redis1
-    Redis1 --> Redis2
-    Celery1 --> Redis1
-    Celery2 --> Redis1
+    App1 --> RedisMaster
+    App2 --> RedisMaster
+    App3 --> RedisMaster
+    RedisMaster --> RedisReplica
+    Celery1 --> RedisMaster
+    Celery2 --> RedisMaster
     Celery1 --> DB1
     Celery2 --> DB1
     App1 --> CDN
