@@ -22,7 +22,9 @@ export default function DocumentEditor() {
   const quillRef = useRef<ReactQuill | null>(null)
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const lastContentRef = useRef<string>('')
+  const lastTitleRef = useRef<string>('')
   const isUpdatingFromRemote = useRef(false)
+  const isUpdatingTitleFromRemote = useRef(false)
 
   useEffect(() => {
     const loadDocument = async () => {
@@ -30,7 +32,9 @@ export default function DocumentEditor() {
         const res = await documents.get(Number(id))
         const docData = res.data
         
-        setTitle(docData.title || 'Untitled Document')
+        const initialTitle = docData.title || 'Untitled Document'
+        setTitle(initialTitle)
+        lastTitleRef.current = initialTitle
         const initialContent = docData.content || '<p><br></p>'
         setContent(initialContent)
         lastContentRef.current = initialContent
@@ -107,10 +111,18 @@ export default function DocumentEditor() {
         }
       })
 
-      // Handle title updates
+      // Handle title updates from other users
       wsRef.current.on('title_update', (data: any) => {
-        if (data.title !== title) {
+        if (data.title && data.title !== lastTitleRef.current) {
+          // Set flag BEFORE making any changes
+          isUpdatingTitleFromRemote.current = true
+          lastTitleRef.current = data.title
           setTitle(data.title)
+          
+          // Keep flag set for a bit longer to prevent echo
+          setTimeout(() => {
+            isUpdatingTitleFromRemote.current = false
+          }, 50)
         }
       })
 
@@ -235,25 +247,42 @@ export default function DocumentEditor() {
   }
 
   const handleTitleChange = (newTitle: string) => {
+    // Don't process if this is from a remote update
+    if (isUpdatingTitleFromRemote.current) {
+      return
+    }
+    
     if (userRole === 'owner' || userRole === 'editor') {
-      setTitle(newTitle)
-      
-      // Send title update via WebSocket
-      if (wsRef.current) {
-        wsRef.current.send({
-          type: 'title_update',
-          title: newTitle,
-          document_id: Number(id)
-        })
+      // Only process if title actually changed
+      if (newTitle !== lastTitleRef.current) {
+        lastTitleRef.current = newTitle
+        setTitle(newTitle)
+        
+        // Send title update via WebSocket immediately
+        if (wsRef.current) {
+          wsRef.current.send({
+            type: 'title_update',
+            title: newTitle,
+            document_id: Number(id)
+          })
+        }
+        
+        // Debounce database save (separate from real-time sync)
+        if (saveTimeoutRef.current) {
+          clearTimeout(saveTimeoutRef.current)
+        }
+        saveTimeoutRef.current = setTimeout(async () => {
+          try {
+            await documents.update(Number(id), {
+              content: content,
+              title: newTitle
+            })
+            console.log('Title auto-saved to database')
+          } catch (err) {
+            console.error('Failed to save title:', err)
+          }
+        }, 1000)
       }
-      
-      // Save title immediately
-      documents.update(Number(id), {
-        content: content,
-        title: newTitle
-      }).catch(err => {
-        console.error('Failed to save title:', err)
-      })
     }
   }
 
