@@ -148,7 +148,8 @@ class UserLogoutAPITests(TestCase):
     def test_logout_unauthenticated(self):
         """Test logout without authentication"""
         response = self.client.post(self.logout_url, format='json')
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        # DRF returns 403 Forbidden for unauthenticated requests with IsAuthenticated permission
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
 
 class UserProfileAPITests(TestCase):
@@ -176,4 +177,5 @@ class UserProfileAPITests(TestCase):
     def test_get_profile_unauthenticated(self):
         """Test getting profile without authentication"""
         response = self.client.get(self.profile_url, format='json')
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        # DRF returns 403 Forbidden for unauthenticated requests with IsAuthenticated permission
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

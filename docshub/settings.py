@@ -87,14 +87,14 @@ ASGI_APPLICATION = "docshub.asgi.application"
 # Try Redis first, fallback to InMemory for development
 try:
     import redis
-    CHANNEL_LAYERS = {
-        "default": {
-            "BACKEND": "channels_redis.core.RedisChannelLayer",
-            "CONFIG": {
-                "hosts": [("127.0.0.1", 6379)],
-            },
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
         },
-    }
+    },
+}
 except ImportError:
     # Fallback to InMemoryChannelLayer if Redis is not available
     CHANNEL_LAYERS = {

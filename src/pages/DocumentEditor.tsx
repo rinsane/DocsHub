@@ -193,9 +193,9 @@ export default function DocumentEditor() {
       clearTimeout(timer)
       clearTimeout(timer2)
       wsRef.current?.disconnect()
-      if (saveTimeoutRef.current) {
-        clearTimeout(saveTimeoutRef.current)
-      }
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current)
+    }
       // Remove Quill listeners
       if (quillRef.current && textChangeHandler) {
         try {
@@ -360,8 +360,8 @@ export default function DocumentEditor() {
               className="btn bg-black text-white hover:bg-gray-800 p-2"
               title="Share document"
             >
-              <Share2 size={18} />
-            </button>
+            <Share2 size={18} />
+          </button>
           )}
           <div className="relative" onClick={(e) => e.stopPropagation()}>
             <button 
@@ -372,8 +372,8 @@ export default function DocumentEditor() {
                 setShowMenu(!showMenu)
               }}
             >
-              <MoreVertical size={18} />
-            </button>
+            <MoreVertical size={18} />
+          </button>
             {/* Dropdown menu */}
             {showMenu && (
               <div 

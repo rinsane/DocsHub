@@ -151,13 +151,15 @@ class SpreadsheetAPITests(TestCase):
     def test_spreadsheet_list_unauthenticated(self):
         """Test listing spreadsheets without authentication"""
         response = self.client.get('/api/spreadsheets/', format='json')
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        # DRF returns 403 Forbidden for unauthenticated requests with IsAuthenticated permission
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
     
     def test_spreadsheet_create(self):
         """Test creating a spreadsheet"""
         self.client.force_authenticate(user=self.owner)
         data = {'title': 'New Spreadsheet'}
-        response = self.client.post('/api/spreadsheets/', data, format='json')
+        # The endpoint is /api/spreadsheets/create/ not /api/spreadsheets/
+        response = self.client.post('/api/spreadsheets/create/', data, format='json')
         
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data['title'], 'New Spreadsheet')

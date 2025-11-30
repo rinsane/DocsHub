@@ -155,13 +155,15 @@ class DocumentAPITests(TestCase):
     def test_document_list_unauthenticated(self):
         """Test listing documents without authentication"""
         response = self.client.get('/api/documents/', format='json')
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        # DRF returns 403 Forbidden for unauthenticated requests with IsAuthenticated permission
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
     
     def test_document_create(self):
         """Test creating a document"""
         self.client.force_authenticate(user=self.owner)
         data = {'title': 'New Document'}
-        response = self.client.post('/api/documents/', data, format='json')
+        # The endpoint is /api/documents/create/ not /api/documents/
+        response = self.client.post('/api/documents/create/', data, format='json')
         
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data['title'], 'New Document')
@@ -285,7 +287,8 @@ class DocumentShareAPITests(TestCase):
             'email': 'user@example.com',
             'role': 'editor'
         }
-        response = self.client.post(f'/api/documents/{self.document.id}/share/', data, format='json')
+        # The endpoint is /api/documents/{id}/permission/add/ not /api/documents/{id}/share/
+        response = self.client.post(f'/api/documents/{self.document.id}/permission/add/', data, format='json')
         
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue(response.data['success'])
@@ -315,7 +318,8 @@ class DocumentShareAPITests(TestCase):
             'email': 'owner@example.com',
             'role': 'editor'
         }
-        response = self.client.post(f'/api/documents/{self.document.id}/share/', data, format='json')
+        # The endpoint is /api/documents/{id}/permission/add/ not /api/documents/{id}/share/
+        response = self.client.post(f'/api/documents/{self.document.id}/permission/add/', data, format='json')
         
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
     

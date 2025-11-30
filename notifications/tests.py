@@ -123,7 +123,8 @@ class NotificationAPITests(TestCase):
     def test_notification_list_unauthenticated(self):
         """Test listing notifications without authentication"""
         response = self.client.get('/api/notifications/', format='json')
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        # DRF returns 403 Forbidden for unauthenticated requests with IsAuthenticated permission
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
     
     def test_unread_count_authenticated(self):
         """Test getting unread count when authenticated"""
@@ -138,7 +139,8 @@ class NotificationAPITests(TestCase):
     def test_unread_count_unauthenticated(self):
         """Test getting unread count without authentication"""
         response = self.client.get('/api/notifications/unread-count/', format='json')
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        # DRF returns 403 Forbidden for unauthenticated requests with IsAuthenticated permission
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
     
     def test_notification_list_limit(self):
         """Test that notification list is limited to 50"""

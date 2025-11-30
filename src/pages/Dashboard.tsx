@@ -21,18 +21,18 @@ export default function Dashboard() {
   const [refreshing, setRefreshing] = useState(false)
 
   const loadData = useCallback(async () => {
-    try {
+      try {
       setRefreshing(true)
-      const [docsRes, sheetsRes] = await Promise.all([
-        documents.list(),
-        spreadsheets.list(),
-      ])
-      setDocs(docsRes.data)
-      setSheets(sheetsRes.data)
-    } catch (error) {
-      console.error('Failed to load files:', error)
-    } finally {
-      setLoading(false)
+        const [docsRes, sheetsRes] = await Promise.all([
+          documents.list(),
+          spreadsheets.list(),
+        ])
+        setDocs(docsRes.data)
+        setSheets(sheetsRes.data)
+      } catch (error) {
+        console.error('Failed to load files:', error)
+      } finally {
+        setLoading(false)
       setRefreshing(false)
     }
   }, [])
@@ -144,10 +144,10 @@ export default function Dashboard() {
               <RefreshCw size={18} className={refreshing ? 'animate-spin' : ''} />
               Refresh
             </button>
-            <button onClick={handleCreateDoc} className="btn btn-primary flex items-center gap-2">
-              <Plus size={18} />
-              New Document
-            </button>
+          <button onClick={handleCreateDoc} className="btn btn-primary flex items-center gap-2">
+            <Plus size={18} />
+            New Document
+          </button>
           </div>
         </div>
 
@@ -176,31 +176,31 @@ export default function Dashboard() {
                   </div>
                   <p className="text-sm text-black/70 mb-4">
                     {isOwner ? 'You own this document' : `Owner: ${doc.owner.username}`}
-                  </p>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => navigate(`/documents/${doc.id}`)}
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => navigate(`/documents/${doc.id}`)}
                       className="flex-1 btn bg-black text-white hover:bg-gray-800 text-sm"
-                    >
-                      Open
-                    </button>
+                  >
+                    Open
+                  </button>
                     {isOwner && (
                       <button 
                         onClick={() => handleShare(doc.id, 'document')}
                         className="btn bg-black text-white hover:bg-gray-800 p-2"
                         title="Share document"
                       >
-                        <Share2 size={18} />
-                      </button>
+                    <Share2 size={18} />
+                  </button>
                     )}
                     {isOwner ? (
-                      <button
-                        onClick={() => handleDelete(doc.id, 'document')}
+                  <button
+                    onClick={() => handleDelete(doc.id, 'document')}
                         className="btn bg-red-600 text-white hover:bg-red-700 p-2"
                         title="Delete document"
-                      >
-                        <Trash2 size={18} />
-                      </button>
+                  >
+                    <Trash2 size={18} />
+                  </button>
                     ) : (
                       <button
                         onClick={() => handleRemove(doc.id, 'document')}
@@ -235,10 +235,10 @@ export default function Dashboard() {
               <RefreshCw size={18} className={refreshing ? 'animate-spin' : ''} />
               Refresh
             </button>
-            <button onClick={handleCreateSheet} className="btn btn-primary flex items-center gap-2">
-              <Plus size={18} />
-              New Spreadsheet
-            </button>
+          <button onClick={handleCreateSheet} className="btn btn-primary flex items-center gap-2">
+            <Plus size={18} />
+            New Spreadsheet
+          </button>
           </div>
         </div>
 
