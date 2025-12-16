@@ -51,7 +51,7 @@ Follow these steps to get DocsHub running on your local machine:
 ### Step 1: Clone the Repository
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/rinsane/DocsHub.git
 cd DocsHub
 ```
 
